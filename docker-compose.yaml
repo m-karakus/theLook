@@ -1,0 +1,110 @@
+services:
+  # --- Infrastructure: PostgreSQL (Dagster + mkpipe backend) ---
+  postgres:
+    image: postgres:16-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-elt}_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./deployment/init-postgres.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - elt_network
+
+  # --- Infrastructure: ClickHouse (DWH target) ---
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    container_name: ${COMPOSE_PROJECT_NAME:-elt}_clickhouse
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_DB: thelook
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: clickhouse
+    ports:
+      - "${CLICKHOUSE_HTTP_PORT:-8123}:8123"
+      - "${CLICKHOUSE_NATIVE_PORT:-9000}:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - elt_network
+
+  # --- Dagster webserver (UI + GraphQL API) ---
+  dagster-webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME:-elt}_webserver
+    restart: unless-stopped
+    command: ["bash", "deployment/init-webserver.sh"]
+    ports:
+      - "${DAGSTER_PORT:-3000}:3000"
+    environment:
+      - DAGSTER_HOME=/app/dagster_home
+      - ENV=${ENV:-prod}
+      - MKPIPE_MAX_CONCURRENT=${MKPIPE_MAX_CONCURRENT:-4}
+      - MKPIPE_MAX_CONCURRENT_HEAVY=${MKPIPE_MAX_CONCURRENT_HEAVY:-1}
+    volumes:
+      - dagster_home:/app/dagster_home
+      - dbt_target:/app/dbt_project/target
+      - ./.credentials.yaml:/app/.credentials.yaml:ro
+      - ./.ssh:/app/.ssh:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    networks:
+      - elt_network
+
+  # --- Dagster daemon (schedules, sensors, run queue) ---
+  dagster-daemon:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME:-elt}_daemon
+    restart: unless-stopped
+    command: ["bash", "deployment/init-daemon.sh"]
+    environment:
+      - DAGSTER_HOME=/app/dagster_home
+      - ENV=${ENV:-prod}
+      - MKPIPE_MAX_CONCURRENT=${MKPIPE_MAX_CONCURRENT:-4}
+      - MKPIPE_MAX_CONCURRENT_HEAVY=${MKPIPE_MAX_CONCURRENT_HEAVY:-1}
+    volumes:
+      - dagster_home:/app/dagster_home
+      - dbt_target:/app/dbt_project/target
+      - ./.credentials.yaml:/app/.credentials.yaml:ro
+      - ./.ssh:/app/.ssh:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+      dagster-webserver:
+        condition: service_started
+    networks:
+      - elt_network
+
+volumes:
+  postgres_data:
+  clickhouse_data:
+  dagster_home:
+  dbt_target:
+
+networks:
+  elt_network:
+    driver: bridge

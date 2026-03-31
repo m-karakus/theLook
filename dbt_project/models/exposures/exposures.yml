@@ -1,0 +1,20 @@
+version: 2
+
+exposures:
+  - name: thelook_reporting
+    type: dashboard
+    maturity: medium
+    description: >
+      theLook e-commerce reporting dashboards.
+      Musteri gelir analizi, kategori bazli satislar ve
+      gunluk AOV raporlari icin kullanilir.
+    depends_on:
+      - ref('mart_customer_revenue')
+      - ref('mart_category_sales')
+      - ref('mart_aov_daily')
+    owner:
+      name: Data Team
+      email: data@example.com
+    config:
+      tags:
+        - reporting

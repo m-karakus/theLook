@@ -1,0 +1,36 @@
+name: "dbt_project"
+version: "1.0.0"
+config-version: 2
+
+profile: "dbt_project"
+
+vars:
+  raw_database: "thelook"
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "logs"
+
+data_tests:
+  +severity: warn
+
+models:
+  dbt_project:
+    thelook:
+      stg:
+        +materialized: view
+        +tags: ['layer:stg']
+
+      mart:
+        +materialized: table
+        +tags: ['layer:mart']
+
+flags:
+  send_anonymous_usage_stats: false

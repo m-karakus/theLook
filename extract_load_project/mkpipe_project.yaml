@@ -1,0 +1,78 @@
+version: 2
+default_environment: prod
+prod:
+  settings:
+    timezone: UTC
+    log_dir: ./logs
+    backend:
+      variant: postgres
+      host: postgres
+      port: 5432
+      database: mkpipe
+      user: postgres
+      password: postgres
+      schema: public
+
+  connections:
+    bq_source:
+      variant: bigquery
+      database: bigquery-public-data
+      schema: thelook_ecommerce
+      credentials_file: /app/.ssh/gcp-credentials.json
+
+    ch_target:
+      variant: clickhouse
+      host: clickhouse
+      port: 8123
+      database: thelook
+      user: default
+      password: clickhouse
+
+  pipelines:
+    - name: bq_to_ch
+      source: bq_source
+      destination: ch_target
+      tag: reporting
+      tables:
+        - name: distribution_centers
+          target_name: raw_bq__distribution_centers
+          replication_method: incremental
+          iterate_column: id
+          iterate_column_type: integer
+          dedup_columns: [id]
+        - name: events
+          target_name: raw_bq__events
+          replication_method: incremental
+          iterate_column: id
+          iterate_column_type: integer
+          dedup_columns: [id]
+        - name: inventory_items
+          target_name: raw_bq__inventory_items
+          replication_method: incremental
+          iterate_column: id
+          iterate_column_type: integer
+          dedup_columns: [id]
+        - name: order_items
+          target_name: raw_bq__order_items
+          replication_method: incremental
+          iterate_column: id
+          iterate_column_type: integer
+          dedup_columns: [id]
+        - name: orders
+          target_name: raw_bq__orders
+          replication_method: incremental
+          iterate_column: order_id
+          iterate_column_type: integer
+          dedup_columns: [order_id]
+        - name: products
+          target_name: raw_bq__products
+          replication_method: incremental
+          iterate_column: id
+          iterate_column_type: integer
+          dedup_columns: [id]
+        - name: users
+          target_name: raw_bq__users
+          replication_method: incremental
+          iterate_column: id
+          iterate_column_type: integer
+          dedup_columns: [id]

@@ -1,0 +1,62 @@
+# folders
+**/__pycache__/
+**/.ruff_cache/
+**/dump/
+# /data/*
+/env/ 
+/venv/
+/.nux/
+/.logs_queue/
+/.vscode/
+/_zip_files/edit/
+
+*.swp
+*.log
+*.pyc
+*.out
+*.xlsx
+*.swl
+*.swm
+*.swn
+*.swo
+*.swf
+*.swh
+*.swj
+*.swk
+*.un~
+
+# Credentials (secrets -- never commit)
+.credentials.yaml
+credentials.yaml
+.ssh/
+gcp-credentials.json
+
+# Dagster
+dagster_home/
+*.db
+tmp*/
+history/
+
+# dbt
+dbt_project/target/
+dbt_project/dbt_packages/
+dbt_project/dbt_internal_packages/
+dbt_project/logs/
+
+# mkpipe
+mkpipe_test_manifest.db
+
+# DevContainer personal tunnel config
+.devcontainer/.env.tunnels
+.devcontainer/tunnels.log
+*.csv
+.python_history
+*.dump
+*dump*.sh
+.attach_pid*
+# *config.json
+# *config.yaml
+# *.env
+# *elt*.yaml
+# *.credentials*.yaml
+# *aws_cloud_formation*.yaml

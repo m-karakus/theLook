@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Raw tables loaded by mkpipe from BigQuery into ClickHouse"
+    database: thelook
+    tables:
+      - name: raw_bq__distribution_centers
+        description: "Distribution center locations"
+      - name: raw_bq__events
+        description: "User browsing events"
+      - name: raw_bq__inventory_items
+        description: "Inventory items with product and cost info"
+      - name: raw_bq__order_items
+        description: "Individual line items within orders"
+      - name: raw_bq__orders
+        description: "Customer orders"
+      - name: raw_bq__products
+        description: "Product catalog with category and pricing"
+      - name: raw_bq__users
+        description: "Registered users / customers"

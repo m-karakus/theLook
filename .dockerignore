@@ -1,0 +1,42 @@
+data/
+.vscode/
+.git/
+docs/
+**dump/
+**__pycache__/
+**.ruff_cache/
+.python_history
+
+# Dagster
+dagster_home/
+*.db
+
+**/dbt_packages/
+**/dbt_internal_packages/
+**/logs/
+**/target/*
+
+# Project files not needed in image
+.opencode/
+.credentials.yaml
+.gitignore
+.ruff.toml
+.sqlfluff
+.vimrc
+README.md
+logs/
+
+# from .gitignore
+.cache
+.dotnet
+.vscode
+.vscode-server
+edit.egg-info
+
+.vim
+*.log
+*.swp
+*.pyc
+*.out
+*.xlsx
+

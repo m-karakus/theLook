@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: mart_customer_revenue
+    description: >
+      Musteri basina toplam gelir ve siparis sayisi.
+      Her musterinin toplam siparis adedi, toplam geliri ve
+      ortalama siparis degeri hesaplanir.
+    columns:
+      - name: user_id
+        tests:
+          - not_null
+          - unique
+      - name: total_orders
+        description: "Toplam siparis sayisi"
+      - name: total_revenue
+        description: "Toplam gelir (sale_price toplami)"
+      - name: avg_order_value
+        description: "Ortalama siparis degeri"
+
+  - name: mart_category_sales
+    description: >
+      Kategori bazli satis ozeti.
+      Urun kategorisi, departman ve marka bazinda
+      toplam satis, gelir ve kar marji hesaplanir.
+    columns:
+      - name: category
+        tests:
+          - not_null
+      - name: total_revenue
+        description: "Toplam satis geliri"
+      - name: profit_margin_pct
+        description: "Kar marji yuzdesi"
+
+  - name: mart_aov_daily
+    description: >
+      Gunluk ortalama siparis degeri (AOV).
+      Her gun icin toplam siparis sayisi, toplam gelir
+      ve ortalama siparis degeri hesaplanir.
+    columns:
+      - name: order_date
+        tests:
+          - not_null
+          - unique
+      - name: avg_order_value
+        description: "Gunluk ortalama siparis degeri"

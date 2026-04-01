@@ -9,25 +9,18 @@ This project demonstrates a complete end-to-end data pipeline for educational pu
 │   Google BigQuery   │────▶│   mkpipe (ETL)   │────▶│   ClickHouse    │
 │ (thelook-ecommerce) │     │                  │     │     (DWH)       │
 └─────────────────────┘     └──────────────────┘     └─────────────────┘
-                                                                 │
-                                                                 ▼
-                                                         ┌─────────────────┐
-                                                         │      dbt        │
-                                                         │ (Transformation)│
-                                                         └─────────────────┘
-                                                                 │
-                                                                 ▼
-                                                         ┌─────────────────┐
-                                                         │   Dagster       │
-                                                         │ (Orchestration) │
-                                                         └─────────────────┘
-                                                                 │
-                                    ┌──────────────────────────────┘
-                                    ▼
-                        ┌─────────────────────┐
-                        │   PostgreSQL        │
-                        │  (Application Logs) │
-                        └─────────────────────┘
+                                                            │
+                                                            ▼
+                                                  ┌─────────────────┐
+                                                  │      dbt        │
+                                                  │ (Transformation)│
+                                                  └─────────────────┘
+                                                            │
+                                                            ▼
+┌─────────────────────┐                          ┌─────────────────┐
+│   PostgreSQL        │◀─────────────────────────│   Dagster       │
+│  (Application Logs) │                          │ (Orchestration)│
+└─────────────────────┘                          └─────────────────┘
 ```
 
 ## Tech Stack
@@ -148,25 +141,18 @@ Bu proje, Veri Mühendisliği eğitimi için tasarlanmış komple bir uçtan uca
 │   Google BigQuery  │────▶│   mkpipe (ETL)   │────▶│   ClickHouse    │
 │ (thelook-ecommerce) │     │                  │     │     (DWH)       │
 └─────────────────────┘     └──────────────────┘     └─────────────────┘
-                                                                 │
-                                                                 ▼
-                                                         ┌─────────────────┐
-                                                         │      dbt        │
-                                                         │ (Dönüştürme)    │
-                                                         └─────────────────┘
-                                                                 │
-                                                                 ▼
-                                                         ┌─────────────────┐
-                                                         │   Dagster       │
-                                                         │ ( Orkestrasyon) │
-                                                         └─────────────────┘
-                                                                 │
-                                    ┌──────────────────────────────┘
-                                    ▼
-                        ┌─────────────────────┐
-                        │   PostgreSQL        │
-                        │  (Uygulama Logları) │
-                        └─────────────────────┘
+                                                            │
+                                                            ▼
+                                                  ┌─────────────────┐
+                                                  │      dbt        │
+                                                  │ (Dönüştürme)    │
+                                                  └─────────────────┘
+                                                            │
+                                                            ▼
+                        ┌─────────────────────┐   ┌─────────────────┐
+                        │   PostgreSQL         │◀──│   Dagster       │
+                        │  (Uygulama Logları)  │   │ (Orkestrasyon)  │
+                        └─────────────────────┘   └─────────────────┘
 ```
 
 ## Teknoloji Stack

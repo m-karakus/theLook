@@ -46,20 +46,24 @@ def build_exposure_jobs() -> list:
             dbt_select=config.dbt_select,
         )
 
-        # Extend selection to include the full pipeline chain:
-        # - .upstream() adds mkpipe ingestion assets (ingestion/* -> dbt sources)
-        # - distribution assets that depend on selected dbt models
+        # Distribution assets that depend on the exposure's DIRECT models only.
         #
-        # NOTE: We must NOT use dbt_selection.downstream() here because stg/int
-        # models are shared across exposures. Dagster's .downstream() traverses
-        # the entire asset graph, so it would pull in dbt models from OTHER
-        # exposures (e.g., stg_dce__cust -> tableau models), causing the job
-        # to select nearly all dbt models instead of just the exposure's subset.
+        # We must NOT use dbt_selection.downstream() because dbt_selection
+        # includes shared stg/int models. Dagster's .downstream() would
+        # traverse through those shared models and pull in distribution
+        # assets from OTHER exposures.
         #
-        # Instead, we intersect .downstream() with only distribution/* assets
-        # to get the specific distribution assets linked to this exposure.
+        # Instead, distribution_dbt_select resolves only the exposure's
+        # direct mart models (e.g. "1+exposure:dwh_api" or "tag:tableau"),
+        # so .downstream() only reaches distribution assets that actually
+        # belong to this exposure.
+        exposure_direct_models = build_dbt_asset_selection(
+            [dwh_dbt_assets],
+            dbt_select=config.distribution_dbt_select,
+        )
         distribution_selection = (
-            dbt_selection.downstream() & AssetSelection.key_prefixes('distribution')
+            exposure_direct_models.downstream()
+            & AssetSelection.key_prefixes('distribution')
         )
 
         full_selection = (

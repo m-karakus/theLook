@@ -31,8 +31,6 @@ def build_ingestion_assets(pipelines: list[PipelineInfo]) -> list[AssetsDefiniti
 
     for pipeline in ingestion_pipelines:
         for table in pipeline.tables:
-            if not table.tags:
-                continue
             asset_def = _create_ingestion_asset(table)
             assets.append(asset_def)
 
@@ -40,8 +38,8 @@ def build_ingestion_assets(pipelines: list[PipelineInfo]) -> list[AssetsDefiniti
     tag_counts: dict[str, int] = defaultdict(int)
     for pipeline in ingestion_pipelines:
         for table in pipeline.tables:
-            if table.tags:
-                tag_counts[table.tags[0]] += 1
+            primary_tag = table.tags[0] if table.tags else 'default'
+            tag_counts[primary_tag] += 1
 
     logger.info(
         'Built %d ingestion assets for tags: %s',
@@ -53,9 +51,9 @@ def build_ingestion_assets(pipelines: list[PipelineInfo]) -> list[AssetsDefiniti
 
 def _create_ingestion_asset(table: MkpipeTable) -> AssetsDefinition:
     """Create a single @asset for one ingestion table."""
-    primary_tag = table.tags[0]
+    primary_tag = table.tags[0] if table.tags else 'default'
     target_name = table.target_name
-    is_heavy = HEAVY_TAG in table.tags
+    is_heavy = HEAVY_TAG in table.tags if table.tags else False
     tags = {HEAVY_TAG: 'true'} if is_heavy else {}
 
     @asset(

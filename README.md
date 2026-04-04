@@ -100,6 +100,19 @@ docker-compose up -d
 docker-compose run --rm pipeline
 ```
 
+## Releases
+
+Tagged releases are available on the [Releases page](https://github.com/m-karakus/theLook/releases).
+
+To use a specific version:
+```bash
+# Pull specific version
+docker pull ghcr.io/m-karakus/thelook:v1.0.0
+
+# Update docker-compose.yaml image tag and restart
+docker compose up -d
+```
+
 ## Pipeline Flow
 
 1. **Ingestion (mkpipe)**: Extract data from BigQuery → Load to ClickHouse

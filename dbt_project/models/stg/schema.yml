@@ -1,0 +1,138 @@
+version: 2
+
+models:
+  - name: stg_users
+    description: "Staging model for thelook users"
+    columns:
+      - name: id
+        description: "Primary key"
+        tests:
+          - not_null
+          - unique
+      - name: first_name
+        tests:
+          - not_null
+      - name: last_name
+        tests:
+          - not_null
+      - name: gender
+        tests:
+          - accepted_values:
+              values: ['M', 'F']
+      - name: created_at
+        tests:
+          - not_null
+
+  - name: stg_orders
+    description: "Staging model for thelook orders"
+    columns:
+      - name: order_id
+        description: "Primary key"
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_users')
+              field: id
+      - name: status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['complete', 'cancelled', 'processing', 'shipped', 'returned']
+      - name: created_at
+        tests:
+          - not_null
+
+  - name: stg_order_items
+    description: "Staging model for thelook order items"
+    columns:
+      - name: id
+        description: "Primary key"
+        tests:
+          - not_null
+          - unique
+      - name: order_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: product_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: id
+      - name: sale_price
+        tests:
+          - not_null
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['complete', 'cancelled', 'processing', 'shipped', 'returned']
+
+  - name: stg_products
+    description: "Staging model for thelook products"
+    columns:
+      - name: id
+        description: "Primary key"
+        tests:
+          - not_null
+          - unique
+      - name: name
+        tests:
+          - not_null
+      - name: category
+        tests:
+          - not_null
+      - name: cost
+        tests:
+          - not_null
+      - name: retail_price
+        tests:
+          - not_null
+
+  - name: stg_inventory_items
+    description: "Staging model for inventory items"
+    columns:
+      - name: id
+        tests:
+          - not_null
+          - unique
+      - name: product_id
+        tests:
+          - not_null
+      - name: created_at
+        tests:
+          - not_null
+
+  - name: stg_events
+    description: "Staging model for user events"
+    columns:
+      - name: id
+        tests:
+          - not_null
+          - unique
+      - name: user_id
+        tests:
+          - not_null
+      - name: event_type
+        tests:
+          - not_null
+      - name: created_at
+        tests:
+          - not_null
+
+  - name: stg_distribution_centers
+    description: "Staging model for distribution centers"
+    columns:
+      - name: id
+        tests:
+          - not_null
+          - unique
+      - name: name
+        tests:
+          - not_null

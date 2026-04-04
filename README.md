@@ -100,6 +100,27 @@ docker-compose up -d
 docker-compose run --rm pipeline
 ```
 
+## Developer Setup
+
+### Pre-commit hooks kurulumu (opsiyonel ama önerilir)
+```bash
+pip install pre-commit
+pre-commit install
+pre-commit run --all-files   # ilk çalıştırmada
+```
+
+### Lint & format
+```bash
+ruff check .        # lint
+ruff format .       # format
+```
+
+### dbt test
+```bash
+cd dbt_project
+dbt test
+```
+
 ## Pipeline Flow
 
 1. **Ingestion (mkpipe)**: Extract data from BigQuery → Load to ClickHouse

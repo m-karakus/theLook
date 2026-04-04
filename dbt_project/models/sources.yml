@@ -1,0 +1,23 @@
+version: 2
+
+sources:
+  - name: thelook_ecommerce
+    description: "Google BigQuery public dataset — thelook ecommerce"
+    database: bigquery-public-data
+    schema: thelook_ecommerce
+    freshness:
+      warn_after: {count: 24, period: hour}
+      error_after: {count: 48, period: hour}
+    tables:
+      - name: orders
+        loaded_at_field: created_at
+      - name: order_items
+        loaded_at_field: created_at
+      - name: users
+        loaded_at_field: created_at
+      - name: products
+      - name: inventory_items
+        loaded_at_field: created_at
+      - name: events
+        loaded_at_field: created_at
+      - name: distribution_centers

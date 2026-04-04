@@ -48,6 +48,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: ghcr.io/m-karakus/thelook:latest
     container_name: ${COMPOSE_PROJECT_NAME:-elt}_webserver
     restart: unless-stopped
     command: ["bash", "deployment/init-webserver.sh"]
@@ -76,6 +77,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: ghcr.io/m-karakus/thelook:latest
     container_name: ${COMPOSE_PROJECT_NAME:-elt}_daemon
     restart: unless-stopped
     command: ["bash", "deployment/init-daemon.sh"]

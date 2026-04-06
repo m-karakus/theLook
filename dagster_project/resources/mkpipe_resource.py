@@ -39,7 +39,7 @@ class MkpipeResource(ConfigurableResource):
         config = str(Path(self.config_path).resolve())
         logger.info("Running mkpipe for tags=%s with config='%s'", tags, config)
         mkpipe.run(config=config, tags=tags)
-        logger.info("Completed mkpipe for tags=%s", tags)
+        logger.info('Completed mkpipe for tags=%s', tags)
 
     def run_pipeline(self, pipeline: str) -> None:
         """Run mkpipe for an entire pipeline.
@@ -50,6 +50,8 @@ class MkpipeResource(ConfigurableResource):
         import mkpipe
 
         config = str(Path(self.config_path).resolve())
-        logger.info("Running mkpipe for pipeline='%s' with config='%s'", pipeline, config)
+        logger.info(
+            "Running mkpipe for pipeline='%s' with config='%s'", pipeline, config
+        )
         mkpipe.run(config=config, pipeline=pipeline)
         logger.info("Completed mkpipe for pipeline='%s'", pipeline)

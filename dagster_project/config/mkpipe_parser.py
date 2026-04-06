@@ -8,8 +8,8 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-INGESTION_DESTINATION_VARIANTS = {"snowflake", "clickhouse"}
-DISTRIBUTION_SOURCE_VARIANTS = {"snowflake", "clickhouse"}
+INGESTION_DESTINATION_VARIANTS = {'snowflake', 'clickhouse'}
+DISTRIBUTION_SOURCE_VARIANTS = {'snowflake', 'clickhouse'}
 
 
 @dataclass(frozen=True)
@@ -52,17 +52,17 @@ def _classify_direction(
     - source is a DWH (snowflake, clickhouse) → distribution (DWH → external target)
     """
     if destination_variant in INGESTION_DESTINATION_VARIANTS:
-        return "ingestion"
+        return 'ingestion'
 
     # S3/Iceberg is also ingestion (DWH reads via external tables)
-    if destination_variant == "file" and destination_config:
-        extra = destination_config.get("extra", {})
-        if extra.get("format") == "iceberg" and extra.get("storage") == "s3":
-            return "ingestion"
+    if destination_variant == 'file' and destination_config:
+        extra = destination_config.get('extra', {})
+        if extra.get('format') == 'iceberg' and extra.get('storage') == 's3':
+            return 'ingestion'
 
     if source_variant in DISTRIBUTION_SOURCE_VARIANTS:
-        return "distribution"
-    return "other"
+        return 'distribution'
+    return 'other'
 
 
 def parse_mkpipe_config(
@@ -82,48 +82,48 @@ def parse_mkpipe_config(
         raw = yaml.safe_load(f)
 
     if environment is None:
-        environment = raw.get("default_environment", "prod")
+        environment = raw.get('default_environment', 'prod')
 
     env_config = raw.get(environment)
     if env_config is None:
         msg = f"Environment '{environment}' not found in {config_path}"
         raise ValueError(msg)
 
-    connections: dict[str, dict] = env_config.get("connections", {})
-    pipelines_raw: list[dict] = env_config.get("pipelines", [])
+    connections: dict[str, dict] = env_config.get('connections', {})
+    pipelines_raw: list[dict] = env_config.get('pipelines', [])
 
     result: list[PipelineInfo] = []
 
     for pipeline in pipelines_raw:
-        pipeline_name = pipeline["name"]
-        source_conn = pipeline["source"]
-        dest_conn = pipeline["destination"]
-        pipeline_tag = pipeline.get("tag", "")
+        pipeline_name = pipeline['name']
+        source_conn = pipeline['source']
+        dest_conn = pipeline['destination']
+        pipeline_tag = pipeline.get('tag', '')
 
-        source_variant = connections.get(source_conn, {}).get("variant", "")
-        dest_variant = connections.get(dest_conn, {}).get("variant", "")
+        source_variant = connections.get(source_conn, {}).get('variant', '')
+        dest_variant = connections.get(dest_conn, {}).get('variant', '')
         dest_config = connections.get(dest_conn, {})
         direction = _classify_direction(source_variant, dest_variant, dest_config)
 
         tables: list[MkpipeTable] = []
-        for table_raw in pipeline.get("tables", []):
+        for table_raw in pipeline.get('tables', []):
             # Table-level tags override; fall back to pipeline-level tag
-            table_tags = table_raw.get("tags", [])
+            table_tags = table_raw.get('tags', [])
             if not table_tags and pipeline_tag:
                 table_tags = [pipeline_tag]
 
             tables.append(
                 MkpipeTable(
-                    name=table_raw["name"],
-                    target_name=table_raw.get("target_name", table_raw["name"]),
-                    replication_method=table_raw.get("replication_method", "full"),
+                    name=table_raw['name'],
+                    target_name=table_raw.get('target_name', table_raw['name']),
+                    replication_method=table_raw.get('replication_method', 'full'),
                     pipeline_name=pipeline_name,
                     source_connection=source_conn,
                     destination_connection=dest_conn,
                     direction=direction,
                     tags=table_tags,
-                    fetchsize=table_raw.get("fetchsize", 1000),
-                    custom_sql=table_raw.get("custom_sql"),
+                    fetchsize=table_raw.get('fetchsize', 1000),
+                    custom_sql=table_raw.get('custom_sql'),
                 )
             )
 
@@ -177,8 +177,5 @@ def get_tables_by_tag(
 def get_all_tags(pipelines: list[PipelineInfo]) -> set[str]:
     """Extract all unique tags across all tables."""
     return {
-        tag
-        for pipeline in pipelines
-        for table in pipeline.tables
-        for tag in table.tags
+        tag for pipeline in pipelines for table in pipeline.tables for tag in table.tags
     }

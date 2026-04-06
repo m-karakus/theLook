@@ -1,3 +1,12 @@
+# # 1. Kur
+# pip install pre-commit
+
+# # 2. Git hook'ları aktifleştir (repo başına bir kez)
+# pre-commit install
+
+# # 3. Artık her git commit'te otomatik çalışır
+# git commit -m "feat: yeni özellik"
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0

@@ -1,0 +1,76 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to AWS EC2
+    runs-on: ubuntu-latest
+    needs: []   # docker-build workflow ayrı çalışır, bu bağımsız tetiklenir
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Write SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Write .env file to EC2
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "mkdir -p ~/thelook && cat > ~/thelook/.env" <<'EOF'
+          ${{ secrets.ENV_FILE }}
+          EOF
+
+      - name: Write .credentials.yaml to EC2
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "cat > ~/thelook/.credentials.yaml" <<'EOF'
+          ${{ secrets.CREDENTIALS_YAML }}
+          EOF
+
+      - name: Login to GHCR on EC2
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin"
+
+      - name: Pull latest image and restart services
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'ENDSSH'
+            cd ~/thelook
+            git pull origin main
+            docker compose pull
+            docker compose up -d --remove-orphans
+          ENDSSH
+
+      - name: Wait for services to be healthy
+        run: |
+          sleep 15
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "docker compose ps"
+
+      - name: Healthcheck — Dagster webserver responding
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "curl -f http://localhost:3000/dagit/health || exit 1"
+          echo "✅ Dagster webserver is healthy"
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "### ✅ Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Host**: \`${{ secrets.EC2_HOST }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify deployment failure
+        if: failure()
+        run: |
+          echo "### ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+          echo "Rollback: ssh EC2 ve 'docker compose up -d --scale dagster-webserver=0' komutunu çalıştır" >> $GITHUB_STEP_SUMMARY

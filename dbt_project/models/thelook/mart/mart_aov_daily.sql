@@ -8,7 +8,7 @@
 -- Gunluk ortalama siparis degeri (AOV)
 
 with order_items as (
-    select * from {{ ref('stg_order_items') }}
+    select * from {{ ref('stg_bq__order_items') }}
     where status not in ('Cancelled', 'Returned')
 ),
 

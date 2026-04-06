@@ -6,10 +6,6 @@ from dagster import Definitions
 from dagster_dbt import DbtCliResource
 
 from dagster_project.assets.dbt_assets import dwh_dbt_assets
-from dagster_project.assets.dbt_operations import (
-    create_iceberg_tables,
-    refresh_all_iceberg_tables,
-)
 from dagster_project.assets.distribution import build_distribution_assets
 from dagster_project.assets.ingestion import build_ingestion_assets
 from dagster_project.config.mkpipe_parser import parse_mkpipe_config
@@ -35,8 +31,6 @@ all_assets = [
     dwh_dbt_assets,  # dbt models (auto-discovered from manifest)
     *ingestion_assets,  # mkpipe ingestion (source -> STG)
     *distribution_assets,  # mkpipe distribution (DWH -> Mongo/PG)
-    create_iceberg_tables,  # manual: create missing iceberg tables
-    refresh_all_iceberg_tables,  # manual: bulk refresh all iceberg tables
 ]
 
 logger.info(

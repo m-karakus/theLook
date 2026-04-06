@@ -8,17 +8,17 @@
 -- Musteri basina toplam gelir + siparis sayisi
 
 with order_items as (
-    select * from {{ ref('stg_order_items') }}
+    select * from {{ ref('stg_bq__order_items') }}
     where status not in ('Cancelled', 'Returned')
 ),
 
 orders as (
-    select * from {{ ref('stg_orders') }}
+    select * from {{ ref('stg_bq__orders') }}
     where status not in ('Cancelled', 'Returned')
 ),
 
 users as (
-    select * from {{ ref('stg_users') }}
+    select * from {{ ref('stg_bq__users') }}
 ),
 
 customer_orders as (

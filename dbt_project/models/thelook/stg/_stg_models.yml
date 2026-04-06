@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: stg_orders
+  - name: stg_bq__orders
     description: "Cleaned orders from BigQuery theLook dataset"
     columns:
       - name: order_id
@@ -9,7 +9,7 @@ models:
           - not_null
           - unique
 
-  - name: stg_order_items
+  - name: stg_bq__order_items
     description: "Cleaned order line items"
     columns:
       - name: order_item_id
@@ -17,7 +17,7 @@ models:
           - not_null
           - unique
 
-  - name: stg_products
+  - name: stg_bq__products
     description: "Product catalog with categories and pricing"
     columns:
       - name: product_id
@@ -25,7 +25,7 @@ models:
           - not_null
           - unique
 
-  - name: stg_users
+  - name: stg_bq__users
     description: "Registered users / customers"
     columns:
       - name: user_id
@@ -33,21 +33,21 @@ models:
           - not_null
           - unique
 
-  - name: stg_events
+  - name: stg_bq__events
     description: "User browsing events"
     columns:
       - name: event_id
         tests:
           - not_null
 
-  - name: stg_inventory_items
+  - name: stg_bq__inventory_items
     description: "Inventory items with cost and product info"
     columns:
       - name: inventory_item_id
         tests:
           - not_null
 
-  - name: stg_distribution_centers
+  - name: stg_bq__distribution_centers
     description: "Distribution center locations"
     columns:
       - name: distribution_center_id

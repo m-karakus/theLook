@@ -48,23 +48,11 @@ class ExposureGroupConfig:
 # To add a new exposure to a group, simply add the tag to the
 # exposure's config in exposures.yml. No changes needed here.
 EXPOSURE_GROUPS: dict[str, ExposureGroupConfig] = {
-    'api': ExposureGroupConfig(
-        dbt_select='+exposure:dwh_api',
-        distribution_dbt_select='1+exposure:dwh_api',
-        cron='0 6,10,14,18 * * *',
-        description='API pipeline - MongoDB endpoints',
-    ),
-    'tableau': ExposureGroupConfig(
-        dbt_select='+tag:tableau',
-        distribution_dbt_select='tag:tableau',
+    'reporting': ExposureGroupConfig(
+        dbt_select='+tag:reporting',
+        distribution_dbt_select='tag:reporting',
         cron='0 5 * * *',
-        description='Tableau BI dashboards',
-    ),
-    'marketing': ExposureGroupConfig(
-        dbt_select='+exposure:marketing_analytics',
-        distribution_dbt_select='1+exposure:marketing_analytics',
-        cron='0 7,15 * * *',
-        description='Marketing analytics pipeline',
+        description='BI dashboards',
     ),
 }
 

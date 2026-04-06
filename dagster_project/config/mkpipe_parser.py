@@ -8,7 +8,8 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-SNOWFLAKE_VARIANT = "snowflake"
+INGESTION_DESTINATION_VARIANTS = {"snowflake", "clickhouse"}
+DISTRIBUTION_SOURCE_VARIANTS = {"snowflake", "clickhouse"}
 
 
 @dataclass(frozen=True)
@@ -46,20 +47,20 @@ def _classify_direction(
 ) -> str:
     """Detect pipeline direction from connection variants.
 
-    - destination is snowflake → ingestion (external source → DWH)
+    - destination is a DWH (snowflake, clickhouse) → ingestion (external source → DWH)
     - destination is S3/Iceberg (file+iceberg) → ingestion (external source → DWH via external tables)
-    - source is snowflake → distribution (DWH → external target)
+    - source is a DWH (snowflake, clickhouse) → distribution (DWH → external target)
     """
-    if destination_variant == SNOWFLAKE_VARIANT:
+    if destination_variant in INGESTION_DESTINATION_VARIANTS:
         return "ingestion"
-    
-    # S3/Iceberg is also ingestion (Snowflake reads via external tables)
+
+    # S3/Iceberg is also ingestion (DWH reads via external tables)
     if destination_variant == "file" and destination_config:
         extra = destination_config.get("extra", {})
         if extra.get("format") == "iceberg" and extra.get("storage") == "s3":
             return "ingestion"
-    
-    if source_variant == SNOWFLAKE_VARIANT:
+
+    if source_variant in DISTRIBUTION_SOURCE_VARIANTS:
         return "distribution"
     return "other"
 

@@ -33,9 +33,9 @@ class DwhDbtTranslator(DagsterDbtTranslator):
             source_name = dbt_resource_props.get('source_name', '')
             table_name = dbt_resource_props.get('name', '')
 
-            # dwh_stg sources -> map to mkpipe ingestion asset keys
-            # e.g. source('dwh_stg', 'raw_dce__cust') -> AssetKey(["ingestion", "raw_dce__cust"])
-            if source_name == 'dwh_stg':
+            # raw sources -> map to mkpipe ingestion asset keys
+            # e.g. source('raw', 'raw_bq__orders') -> AssetKey(["ingestion", "raw_bq__orders"])
+            if source_name == 'raw':
                 return AssetKey(['ingestion', table_name])
 
             # dwh audit sources -- these reference the same DWH tables

@@ -53,9 +53,13 @@ def refresh_all_iceberg_tables() -> None:
 def _run_dbt_operation(operation_name: str) -> None:
     """Run a dbt run-operation command as a subprocess."""
     cmd = [
-        'dbt', 'run-operation', operation_name,
-        '--project-dir', str(DBT_PROJECT_DIR),
-        '--profiles-dir', str(DBT_PROJECT_DIR / '.dbt'),
+        'dbt',
+        'run-operation',
+        operation_name,
+        '--project-dir',
+        str(DBT_PROJECT_DIR),
+        '--profiles-dir',
+        str(DBT_PROJECT_DIR / '.dbt'),
     ]
     logger.info('Executing: %s', ' '.join(cmd))
     result = subprocess.run(cmd, capture_output=True, text=True, check=False)

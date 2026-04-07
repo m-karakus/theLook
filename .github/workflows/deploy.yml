@@ -42,7 +42,7 @@ jobs:
 
       - name: Sync project files to EC2
         run: |
-          rsync -avz --exclude='.git' --exclude='.env' --exclude='.credentials.yaml' \
+          rsync -avz --delete --exclude='.git' --exclude='.env' --exclude='.credentials.yaml' \
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/thelook/
 

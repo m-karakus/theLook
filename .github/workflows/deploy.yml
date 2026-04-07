@@ -46,9 +46,13 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/thelook/
 
-      - name: Pull Docker images and restart services
+      - name: Stop services and clean up old images
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bash -c 'cd ~/thelook && docker compose pull && docker compose up -d --force-recreate --remove-orphans'"
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bash -c 'cd ~/thelook && docker compose down && docker system prune -af'"
+
+      - name: Pull Docker images and start services
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bash -c 'cd ~/thelook && docker compose pull && docker compose up -d --remove-orphans'"
 
       - name: Wait for services and healthcheck
         run: |

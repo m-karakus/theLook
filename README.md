@@ -13,7 +13,7 @@ This project demonstrates a complete end-to-end data pipeline for educational pu
 | Source | Google BigQuery (theLook Ecommerce) |
 | DWH | ClickHouse (Docker) |
 | Logs | PostgreSQL |
-| ETL | mkpipe (custom) |
+| ETL | [mkpipe (custom)](https://github.com/mkpipe-etl/mkpipe) |
 | Transformation | dbt |
 | Orchestration | Dagster |
 | Deployment | AWS EC2 (Docker) |

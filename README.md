@@ -257,4 +257,3 @@ docker-compose run --rm pipeline
 ## Detaylı Dokümantasyon
 
 Detaylı mimari dokümantasyonu için: https://m-karakus.github.io/docs/architecture/data-architecture
-

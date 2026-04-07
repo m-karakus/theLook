@@ -58,12 +58,12 @@ jobs:
         run: |
           sleep 15
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
-            "docker compose ps"
+            "cd ~/thelook && docker compose ps"
 
       - name: Healthcheck — Dagster webserver responding
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
-            "curl -f http://localhost:3000/dagit/health || exit 1"
+            "cd ~/thelook && curl -sf http://localhost:3000/server_info || exit 1"
           echo "✅ Dagster webserver is healthy"
 
       - name: Notify deployment success

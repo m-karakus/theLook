@@ -48,32 +48,27 @@ jobs:
 
       - name: Pull Docker images and restart services
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'ENDSSH'
-            cd ~/thelook
-            docker compose pull
-            docker compose up -d --remove-orphans
-          ENDSSH
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bash -c 'cd ~/thelook && docker compose pull && docker compose up -d --remove-orphans'"
 
       - name: Wait for services and healthcheck
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'ENDSSH'
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bash -c '
             cd ~/thelook
-            echo "Waiting for Dagster webserver..."
-            for i in $(seq 1 24); do
-              if curl -sf http://localhost:3000/server_info > /dev/null 2>&1 || \
-                 curl -sf http://localhost:3000/dagit_info > /dev/null 2>&1; then
-                echo "✅ Dagster webserver is healthy"
+            echo Waiting for Dagster webserver...
+            for i in \$(seq 1 24); do
+              if curl -sf http://localhost:3000/server_info > /dev/null 2>&1 || curl -sf http://localhost:3000/dagit_info > /dev/null 2>&1; then
+                echo Dagster webserver is healthy
                 docker compose ps
                 exit 0
               fi
-              echo "  Attempt $i/24 — not ready yet, waiting 5s..."
+              echo \"  Attempt \$i/24 - not ready yet, waiting 5s...\"
               sleep 5
             done
-            echo "❌ Dagster webserver did not become healthy in 120s"
+            echo Dagster webserver did not become healthy in 120s
             docker compose ps
             docker compose logs dagster-webserver --tail=30
             exit 1
-          ENDSSH
+          '"
 
       - name: Notify deployment success
         if: success()

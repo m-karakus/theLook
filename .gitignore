@@ -1,20 +1,41 @@
-# folders
-**/__pycache__/
-**/.ruff_cache/
-**/dump/
-# /data/*
-/env/ 
-/venv/
-/.nux/
-/.logs_queue/
-/.vscode/
-/_zip_files/edit/
+# Credentials & secrets
+.env
+.credentials.yaml
+credentials.yaml
+*.pem
+*.key
+.ssh/
+gcp-credentials.json
 
+# Python
+**/__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+**/.ruff_cache/
+
+# dbt
+dbt_project/target/
+dbt_project/dbt_packages/
+dbt_project/dbt_internal_packages/
+dbt_project/.dbt/
+dbt_project/logs/
+
+# Dagster
+dagster_home/
+*.db
+tmp*/
+history/
+
+# IDE
+.idea/
+.vscode/
 *.swp
-*.log
-*.pyc
-*.out
-*.xlsx
 *.swl
 *.swm
 *.swn
@@ -24,24 +45,18 @@
 *.swj
 *.swk
 *.un~
+.DS_Store
 
-# Credentials (secrets -- never commit)
-.credentials.yaml
-credentials.yaml
-.ssh/
-gcp-credentials.json
-
-# Dagster
-dagster_home/
-*.db
-tmp*/
-history/
-
-# dbt
-dbt_project/target/
-dbt_project/dbt_packages/
-dbt_project/dbt_internal_packages/
-dbt_project/logs/
+# Other
+**/dump/
+/env/
+/.nux/
+/.logs_queue/
+/_zip_files/edit/
+*.log
+*.pyc
+*.out
+*.xlsx
 
 # mkpipe
 mkpipe_test_manifest.db
@@ -54,9 +69,3 @@ mkpipe_test_manifest.db
 *.dump
 *dump*.sh
 .attach_pid*
-# *config.json
-# *config.yaml
-# *.env
-# *elt*.yaml
-# *.credentials*.yaml
-# *aws_cloud_formation*.yaml

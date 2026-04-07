@@ -100,6 +100,38 @@ docker-compose up -d
 docker-compose run --rm pipeline
 ```
 
+## Developer Setup
+
+### Pre-commit hooks kurulumu (opsiyonel ama önerilir)
+```bash
+pip install pre-commit
+pre-commit install
+pre-commit run --all-files   # ilk çalıştırmada
+```
+
+### Lint & format
+```bash
+ruff check .        # lint
+ruff format .       # format
+```
+
+### dbt test
+```bash
+cd dbt_project
+dbt test
+## Releases
+
+Tagged releases are available on the [Releases page](https://github.com/m-karakus/theLook/releases).
+
+To use a specific version:
+```bash
+# Pull specific version
+docker pull ghcr.io/m-karakus/thelook:v1.0.0
+
+# Update docker-compose.yaml image tag and restart
+docker compose up -d
+```
+
 ## Pipeline Flow
 
 1. **Ingestion (mkpipe)**: Extract data from BigQuery → Load to ClickHouse

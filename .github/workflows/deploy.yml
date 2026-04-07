@@ -1,0 +1,89 @@
+name: Deploy to EC2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, release1]
+
+jobs:
+  deploy:
+    name: Deploy to AWS EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Write SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Write .env file to EC2
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "mkdir -p ~/thelook && cat > ~/thelook/.env" <<'EOF'
+          ${{ secrets.ENV_FILE }}
+          EOF
+
+      - name: Write .credentials.yaml to EC2
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "cat > ~/thelook/.credentials.yaml" <<'EOF'
+          ${{ secrets.CREDENTIALS_YAML }}
+          EOF
+
+      - name: Login to GHCR on EC2
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} \
+            "echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin"
+
+      - name: Sync project files to EC2
+        run: |
+          rsync -avz --delete --exclude='.git' --exclude='.env' --exclude='.credentials.yaml' \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:~/thelook/
+
+      - name: Stop services and clean up old images
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bash -c 'cd ~/thelook && docker compose down && docker system prune -af'"
+
+      - name: Pull Docker images and start services
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bash -c 'cd ~/thelook && docker compose pull && docker compose up -d --remove-orphans'"
+
+      - name: Wait for services and healthcheck
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "bash -c '
+            cd ~/thelook
+            echo Waiting for Dagster webserver...
+            for i in \$(seq 1 24); do
+              if curl -sf http://localhost:3000/server_info > /dev/null 2>&1 || curl -sf http://localhost:3000/dagit_info > /dev/null 2>&1; then
+                echo Dagster webserver is healthy
+                docker compose ps
+                exit 0
+              fi
+              echo \"  Attempt \$i/24 - not ready yet, waiting 5s...\"
+              sleep 5
+            done
+            echo Dagster webserver did not become healthy in 120s
+            docker compose ps
+            docker compose logs dagster-webserver --tail=30
+            exit 1
+          '"
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "### ✅ Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Host**: \`${{ secrets.EC2_HOST }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify deployment failure
+        if: failure()
+        run: |
+          echo "### ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+          echo "Rollback: ssh EC2 ve 'docker compose up -d --scale dagster-webserver=0' komutunu çalıştır" >> $GITHUB_STEP_SUMMARY

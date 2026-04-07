@@ -1,0 +1,35 @@
+# # 1. Kur
+# pip install pre-commit
+
+# # 2. Git hook'ları aktifleştir (repo başına bir kez)
+# pre-commit install
+
+# # 3. Artık her git commit'te otomatik çalışır
+# git commit -m "feat: yeni özellik"
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: detect-private-key
+      - id: check-merge-conflict
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.0
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 3.0.0
+    hooks:
+      - id: sqlfluff-lint
+        args: [--dialect, ansi]
+        files: ^dbt_project/models/.*\.sql$

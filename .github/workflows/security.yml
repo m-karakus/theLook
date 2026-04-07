@@ -2,9 +2,9 @@ name: Security & Code Quality
 
 on:
   push:
-    branches: [main, release, release1]
+    branches: [main, release, release1, release_sunum]
   pull_request:
-    branches: [main, release, release1]
+    branches: [main, release, release1, release_sunum]
 
 jobs:
   secret-scan:

@@ -9,7 +9,7 @@ dbt-clickhouse>=1.8
 # mkpipe
 mkpipe>=0.7.17
 mkpipe[postgres-backend]
-mkpipe-extractor-bigquery>=0.4.5
+mkpipe-extractor-bigquery>=0.5.0
 mkpipe-loader-clickhouse>=0.6.6
 # dagster
 dagster>=1.9

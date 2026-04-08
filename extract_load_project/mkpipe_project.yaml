@@ -38,41 +38,41 @@ prod:
           target_name: raw_bq__distribution_centers
           replication_method: incremental
           iterate_column: id
-          iterate_column_type: integer
+          iterate_column_type: int
           dedup_columns: [id]
         - name: events
           target_name: raw_bq__events
           replication_method: incremental
           iterate_column: id
-          iterate_column_type: integer
+          iterate_column_type: int
           dedup_columns: [id]
         - name: inventory_items
           target_name: raw_bq__inventory_items
           replication_method: incremental
           iterate_column: id
-          iterate_column_type: integer
+          iterate_column_type: int
           dedup_columns: [id]
         - name: order_items
           target_name: raw_bq__order_items
           replication_method: incremental
           iterate_column: id
-          iterate_column_type: integer
+          iterate_column_type: int
           dedup_columns: [id]
         - name: orders
           target_name: raw_bq__orders
           replication_method: incremental
           iterate_column: order_id
-          iterate_column_type: integer
+          iterate_column_type: int
           dedup_columns: [order_id]
         - name: products
           target_name: raw_bq__products
           replication_method: incremental
           iterate_column: id
-          iterate_column_type: integer
+          iterate_column_type: int
           dedup_columns: [id]
         - name: users
           target_name: raw_bq__users
           replication_method: incremental
           iterate_column: id
-          iterate_column_type: integer
+          iterate_column_type: int
           dedup_columns: [id]

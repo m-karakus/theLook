@@ -2,9 +2,3 @@ load_from:
   - python_package:
       package_name: dagster_project
       working_directory: /app
-
-
-xxxx:
-  - python_package:
-      package_name: dagster_project
-      working_directory: /app

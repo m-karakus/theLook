@@ -1,4 +1,7 @@
-| # | Branch | Durum |
+|
+
+# | Branch | Durum |
+
 |---|--------|-------|
 | 3 | `feature/security-pipeline` | ✅ Push edildi |
 | 1 | `feature/secret-cleanup` | ✅ Push edildi |
